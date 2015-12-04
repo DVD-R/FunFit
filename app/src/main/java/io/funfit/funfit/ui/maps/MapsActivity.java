@@ -1,4 +1,4 @@
-package io.funfit.funfit;
+package io.funfit.funfit.ui.maps;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import io.funfit.funfit.R;
 
 public class MapsActivity extends FragmentActivity {
 
