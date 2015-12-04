@@ -1,5 +1,7 @@
 package io.funfit.funfit.ui.login;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -16,7 +18,6 @@ import io.funfit.funfit.ui.App;
  */
 public class LoginActivity extends AppCompatActivity{
     @Inject LoginFragment mLoginFragment;
-
     LoginComponent mComponent;
 
     LoginComponent component(){
@@ -35,8 +36,13 @@ public class LoginActivity extends AppCompatActivity{
         setContentView(R.layout.activity_container);
         component().inject(this);
 
+        if(Build.VERSION.SDK_INT == 21 ){
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+
         if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.frag_container, mLoginFragment);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frag_container, mLoginFragment).commit();
         }
     }
 }

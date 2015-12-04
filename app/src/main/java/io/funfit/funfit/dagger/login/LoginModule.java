@@ -2,6 +2,7 @@ package io.funfit.funfit.dagger.login;
 
 import android.app.Activity;
 import android.app.Application;
+import android.graphics.Typeface;
 
 import javax.inject.Singleton;
 
@@ -32,5 +33,12 @@ public class LoginModule {
     @PerActivity
     LoginFragment loginFragment(){
         return new LoginFragment();
+    }
+
+
+    @Provides
+    @PerActivity
+    Typeface helveticaFace(){
+        return Typeface.createFromAsset(activity.getAssets(), "HelveticaBold.otf");
     }
 }
