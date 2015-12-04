@@ -1,5 +1,7 @@
 package io.funfit.funfit.dagger.login;
 
+import android.graphics.Typeface;
+
 import dagger.Component;
 import io.funfit.funfit.dagger.PerActivity;
 import io.funfit.funfit.dagger.app.AppComponent;
@@ -15,5 +17,5 @@ public interface LoginComponent {
     void inject(LoginActivity loginActivity);
     void inject(LoginFragment loginFragment);
 
-    LoginFragment loginFragment();
+    Typeface helveticaFace();
 }
