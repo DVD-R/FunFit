@@ -2,6 +2,11 @@
 <manifest package="io.funfit.funfit"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <permission android:name="com.example.mapdemo.permission.MAPS_RECEIVE" android:protectionLevel="signature"/>
+    <uses-permission android:name="com.example.mapdemo.permission.MAPS_RECEIVE"/>
+
+    <uses-permission android:name="com.example.mapdemo.permission.MAPS_RECEIVE" />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -26,7 +31,7 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/google_maps_key"/>
 
-        <activity android:name=".ui.login.LoginActivity"
+        <activity android:name=".ui.maps.MapsActivity"
                   android:theme="@style/SemiTransparentBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -35,8 +40,8 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".ui.maps.MapsActivity"/>
+        <!--<activity-->
+            <!--android:name=".ui.maps.MapsActivity"/>-->
     </application>
 
 </manifest>
