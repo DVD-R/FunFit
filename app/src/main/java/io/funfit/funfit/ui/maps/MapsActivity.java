@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -20,16 +21,26 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
 
 import io.funfit.funfit.R;
 
 public class MapsActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener, OnMapClickListener, OnMapLongClickListener, OnMarkerClickListener {
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -37,6 +48,10 @@ public class MapsActivity extends AppCompatActivity implements
     private LocationRequest mLocationRequest;
     private long UPDATE_INTERVAL = 60000;  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
+
+    private ArrayList<LatLng> arrayPoints = null;
+    PolylineOptions polylineOptions;
+    private boolean checkClick = false;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -49,18 +64,22 @@ public class MapsActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+
+//        Parse.initialize(this, getString(R.string.APPLICATION_ID), getString(R.string.CLIENT_KEY));
+
         mapFragment = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map));
         if (mapFragment != null) {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap map) {
                     loadMap(map);
+                    arrayPoints = new ArrayList<LatLng>();
+
                 }
             });
         } else {
             Toast.makeText(this, "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     protected void loadMap(GoogleMap googleMap) {
@@ -68,18 +87,21 @@ public class MapsActivity extends AppCompatActivity implements
         if (map != null) {
             // Map is ready
             Toast.makeText(this, "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
-            map.setMyLocationEnabled(true);
+            //map.setMyLocationEnabled(true);
 
             // Now that map has loaded, let's get our location!
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this).build();
+            map.setMyLocationEnabled(true);
 
             connectClient();
         } else {
             Toast.makeText(this, "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
+
+
     }
 
     protected void connectClient() {
@@ -99,7 +121,7 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     /*
-	 * Called when the Activity is no longer visible.
+     * Called when the Activity is no longer visible.
 	 */
     @Override
     protected void onStop() {
@@ -170,6 +192,10 @@ public class MapsActivity extends AppCompatActivity implements
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
             map.animateCamera(cameraUpdate);
+            map.setMyLocationEnabled(true);
+            map.setOnMapClickListener(this);
+            map.setOnMapLongClickListener(this);
+            map.setOnMarkerClickListener(this);
             startLocationUpdates();
         } else {
             Toast.makeText(this, "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
@@ -234,6 +260,56 @@ public class MapsActivity extends AppCompatActivity implements
             Toast.makeText(getApplicationContext(),
                     "Sorry. Location services not available to you", Toast.LENGTH_LONG).show();
         }
+    }
+
+    //get GeoPoint everytime you click in the map
+    @Override
+    public void onMapClick(LatLng latLng) {
+        if (checkClick == false) {
+            Toast.makeText(MapsActivity.this, "test", Toast.LENGTH_SHORT).show();
+            map.addMarker(new MarkerOptions().position(latLng).title("This is my empire"));
+            arrayPoints.add(latLng);
+        }
+    }
+
+    //clear map and array of geo location
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        map.clear();
+        arrayPoints.clear();
+        checkClick = false;
+    }
+
+    //this is where you draw a line evertime you click
+    public void countPolygonPoints() {
+        if (arrayPoints.size() >= 5) {
+            checkClick = true;
+            PolygonOptions polygonOptions = new PolygonOptions();
+            polygonOptions.addAll(arrayPoints);
+            polygonOptions.strokeColor(Color.BLUE);
+            polygonOptions.strokeWidth(7);
+            polygonOptions.fillColor(Color.CYAN);
+            Polygon polygon = map.addPolygon(polygonOptions);
+
+
+
+//            ParseObject testObject = new ParseObject("User");
+//            testObject.put("username","rickydnfgkdj");
+//            testObject.saveInBackground();
+        }
+    }
+
+    //condition if the last array is click to the first
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        System.out.println("Marker lat long=" + marker.getPosition());
+        System.out.println("First postion check" + arrayPoints.get(0));
+        System.out.println("**********All arrayPoints***********" + arrayPoints);
+        if (arrayPoints.get(0).equals(marker.getPosition())) {
+            System.out.println("********First Point choose************");
+            countPolygonPoints();
+        }
+        return false;
     }
 
     // Define a DialogFragment that displays the error dialog
